@@ -12,7 +12,7 @@
 
 
 ## Demo
-Link: [https://flight-price-prediction-api.herokuapp.com/](https://flight-price-prediction-api.herokuapp.com/)
+Link: [https://flight-fare-prediction-web.herokuapp.com/](https://flight-price-prediction-api.herokuapp.com/)
 
 [![](https://imgur.com/5XDtNM4)](https://flight-price-prediction-api.herokuapp.com/)
 

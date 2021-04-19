@@ -3,7 +3,6 @@ from flask_cors import cross_origin
 import sklearn
 import pickle
 import pandas as pd
-from flask_table import Table, Col
 from datetime import timedelta, date
 app = Flask(__name__)
 model = pickle.load(open("flight_rf.pkl", "rb"))

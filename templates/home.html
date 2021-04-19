@@ -41,7 +41,7 @@
                 <div class="col-sm-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Departure Date</h5>
+                            <h5 class="card-title">Initial Date</h5>
                             <!-- Departure -->
                             <input type="datetime-local" name="Dep_Time" id="Dep_Time" required="required">
                         </div>
@@ -53,7 +53,7 @@
                 <div class="col-sm-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Arrival Date</h5>
+                            <h5 class="card-title">Final Date</h5>
                             <!-- Arrival -->
                             <input type="datetime-local" name="Arrival_Time" id="Arrival_Time" required="required">
                         </div>
@@ -153,16 +153,49 @@
             <input type="submit" value="Submit" class="btn btn-secondary">
         </form>
 
-        <br>
-        <br>
-        <h3>{{ prediction_text }}</h3>
-
-        <br>
+        
+        {% if array|length>0 %}
+        <div style="height: 300px;overflow-y: auto;margin-left: auto;margin-right: auto;border:1px solid #0dcaf0;background-image: url('https://www.airlinesbooking.net/wp-content/uploads/2018/07/Best-Flight-Deals.jpg');background-size: auto;">
+            <table style="margin: 3px ; margin-left: auto;margin-right: auto;border: 1px rgb(30, 146, 192) black;border-top:1px rgb(30, 146, 192);outline:#0dcaf0;width: auto;">
+                <tr>
+                    <th style="position: sticky;top:0px;border: 1px solid rgb(30, 146, 192);padding: 15px;text-align: center;width: auto;background-color: #0dcaf0;opacity: 1;border-collapse: separate;border-radius: 6px;">Date</th>
+                    <th style="position: sticky;top:0px;border: 1px solid rgb(30, 146, 192);padding: 15px;text-align: center;width: auto;background-color: #0dcaf0;border-collapse: separate;border-radius: 6px;">Price of Ticket (In INR)</th>
+                </tr>
+                
+                {% for i in array %}
+                <tr style="background-color: #e4dde07d">
+                    {% if minimum == i[1] %}
+                    <th style="color: black;border: 1px solid rgb(30, 146, 192);padding: 15px;text-align: center;background-color: transparent;border-radius: 6px;width: auto;"> {{ i[0] }} </th>
+                    <th style="color: black;border: 1px solid rgb(30, 146, 192);padding: 15px;text-align: center;background-color: transparent;border-radius: 6px;width: auto;"> {{ i[1] }}<p class="blink">*Recommended</p></td>
+                    {% else %}
+                    <th style="color: black;border: 1px solid rgb(30, 146, 192);padding: 15px;text-align: center;background-color: transparent;border-radius: 6px;width: auto;"> {{ i[0] }} </th>
+                    <th style="color: black;border: 1px solid rgb(30, 146, 192);padding: 15px;text-align: center;background-color: transparent;border-radius: 6px;width: auto;"> {{ i[1] }} </td>
+                    {% endif %}
+               </tr>
+                {% endfor %}
+                
+        
+            </table>
+        </div>
+        {% endif %}
         <br>
         <p>©2021 Ganesh Thorat</p>
 
     </div>
-
+    <style>
+        .blink {
+          animation: blinker 0.6s linear infinite;
+          color: #f30909;
+          font-size: auto;
+          font-weight: bold;
+          font-family: sans-serif;
+        }
+        @keyframes blinker {
+          50% {
+            opacity: 0;
+          }
+        }
+    </style>
 
 
 

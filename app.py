@@ -3,7 +3,8 @@ from flask_cors import cross_origin
 import sklearn
 import pickle
 import pandas as pd
-
+from flask_table import Table, Col
+from datetime import timedelta, date
 app = Flask(__name__)
 model = pickle.load(open("flight_rf.pkl", "rb"))
 
@@ -12,22 +13,20 @@ model = pickle.load(open("flight_rf.pkl", "rb"))
 @app.route("/")
 @cross_origin()
 def home():
+    array=[]
     return render_template("home.html")
-
-
 
 
 @app.route("/predict", methods = ["GET", "POST"])
 @cross_origin()
 def predict():
     if request.method == "POST":
-
+        array=[]
+        dates_array=[]
+        output=[]
         # Date_of_Journey
         date_dep = request.form["Dep_Time"]
-        Journey_day = int(pd.to_datetime(date_dep, format="%Y-%m-%dT%H:%M").day)
-        Journey_month = int(pd.to_datetime(date_dep, format ="%Y-%m-%dT%H:%M").month)
-        # print("Journey Date : ",Journey_day, Journey_month)
-
+        
         # Departure
         Dep_hour = int(pd.to_datetime(date_dep, format ="%Y-%m-%dT%H:%M").hour)
         Dep_min = int(pd.to_datetime(date_dep, format ="%Y-%m-%dT%H:%M").minute)
@@ -35,18 +34,34 @@ def predict():
 
         # Arrival
         date_arr = request.form["Arrival_Time"]
-        Arrival_hour = int(pd.to_datetime(date_arr, format ="%Y-%m-%dT%H:%M").hour)
-        Arrival_min = int(pd.to_datetime(date_arr, format ="%Y-%m-%dT%H:%M").minute)
-        # print("Arrival : ", Arrival_hour, Arrival_min)
-
-        # Duration
-        dur_hour = abs(Arrival_hour - Dep_hour)
-        dur_min = abs(Arrival_min - Dep_min)
-        # print("Duration : ", dur_hour, dur_min)
+        
+        
 
         # Total Stops
         Total_stops = int(request.form["stops"])
         # print(Total_stops)
+
+        # Duration
+        if Total_stops=="non-stop":
+            dur_hour=1.95
+            dur_min=32.6969
+        elif Total_stops=="1 stop":
+            dur_hour=12.60
+            dur_min=25.8124
+        elif Total_stops=="2 stops":
+            dur_hour=20.0953
+            dur_min=27.8157
+        elif Total_stops=="3 stops":
+            dur_hour=25.4444
+            dur_min=20.7777
+        else:
+            dur_hour=29
+            dur_min=30
+        # print("Duration : ", dur_hour, dur_min)
+
+        Arrival_hour = Dep_hour+dur_hour
+        Arrival_min = Dep_min+dur_min
+        # print("Arrival : ", Arrival_hour, Arrival_min)
 
         # Airline
         # AIR ASIA = 0 (not in column)
@@ -322,43 +337,65 @@ def predict():
     #    'Destination_Cochin', 'Destination_Delhi', 'Destination_Hyderabad',
     #    'Destination_Kolkata', 'Destination_New Delhi']
         
-        prediction=model.predict([[
-            Total_stops,
-            Journey_day,
-            Journey_month,
-            Dep_hour,
-            Dep_min,
-            Arrival_hour,
-            Arrival_min,
-            dur_hour,
-            dur_min,
-            Air_India,
-            GoAir,
-            IndiGo,
-            Jet_Airways,
-            Jet_Airways_Business,
-            Multiple_carriers,
-            Multiple_carriers_Premium_economy,
-            SpiceJet,
-            Trujet,
-            Vistara,
-            Vistara_Premium_economy,
-            s_Chennai,
-            s_Delhi,
-            s_Kolkata,
-            s_Mumbai,
-            d_Cochin,
-            d_Delhi,
-            d_Hyderabad,
-            d_Kolkata,
-            d_New_Delhi
-        ]])
+        
 
-        output=round(prediction[0],2)
+        def daterange(date1, date2):
+            for n in range(int ((date2 - date1).days)+1):
+                yield date1 + timedelta(n)
 
-        return render_template('home.html',prediction_text="Your Flight price is Rs. {}".format(output))
+        
+        start_dt = date_dep[:10]
+        start_dt=date(int(start_dt[:4]),int(start_dt[5:7]),int(start_dt[8:10]))
+        end_dt = date_arr[:10]
+        end_dt=date(int(end_dt[:4]),int(end_dt[5:7]),int(end_dt[8:10]))
+        
 
+        for dt in daterange(start_dt, end_dt):
+            dates_array.append(dt.strftime("%Y-%m-%d"))
 
+        for i in range(len(dates_array)):
+            Journey_day = int(pd.to_datetime(dates_array[i], format="%Y-%m-%d").day)
+            Journey_month = int(pd.to_datetime(dates_array[i], format ="%Y-%m-%d").month)
+            # print("Journey Date : ",Journey_day, Journey_month)
+
+            prediction=model.predict([[
+                Total_stops,
+                Journey_day,
+                Journey_month,
+                Dep_hour,
+                Dep_min,
+                Arrival_hour,
+                Arrival_min,
+                dur_hour,
+                dur_min,
+                Air_India,
+                GoAir,
+                IndiGo,
+                Jet_Airways,
+                Jet_Airways_Business,
+                Multiple_carriers,
+                Multiple_carriers_Premium_economy,
+                SpiceJet,
+                Trujet,
+                Vistara,
+                Vistara_Premium_economy,
+                s_Chennai,
+                s_Delhi,
+                s_Kolkata,
+                s_Mumbai,
+                d_Cochin,
+                d_Delhi,
+                d_Hyderabad,
+                d_Kolkata,
+                d_New_Delhi
+            ]])
+
+            output.append(round(prediction[0],2))
+
+        minimum=min(output)
+        for i in range(len(dates_array)):
+            array.append([dates_array[i],output[i]])
+        return render_template('home.html',array=array,minimum=minimum)
     return render_template("home.html")
 
 

@@ -14,7 +14,7 @@
 ## Demo
 Link: [https://flight-fare-prediction-web.herokuapp.com/](https://flight-fare-prediction-web.herokuapp.com/)
 
-[![](https://www.flickr.com/photos/193125934@N08/shares/Z2BE66)](https://flight-fare-prediction-web.herokuapp.com/)
+[![]https://i.imgur.com/n0SnFKw.png)](https://flight-fare-prediction-web.herokuapp.com/)
 
 [![](https://i.imgur.com/XAb9NXy.jpg)](https://flight-fare-prediction-web.herokuapp.com/)
 
